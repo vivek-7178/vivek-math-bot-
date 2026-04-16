@@ -4,7 +4,7 @@ import os
 
 # Render ke variables se keys uthana
 BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
-GEMINI_KEY = os.environ.get('GEMINI_API_KEY')
+GEMINI_KEY = os.environ. get('GEMINI_API_KEY')
 
 # AI aur Bot setup
 genai.configure(api_key=GEMINI_KEY)
