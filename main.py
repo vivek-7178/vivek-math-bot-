@@ -1,37 +1,28 @@
 import telebot
-from sympy import symbols, solve, Eq
+import google.generativeai as genai
+import os
 
-# Tera Asli Token
-TOKEN = '8720752639:AAHdgC6XpkV63saRSJ7wfHaWQ0yFIwyI-YU'
-bot = telebot.TeleBot(TOKEN)
+# Render ke variables se keys uthana
+BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
+GEMINI_KEY = os.environ.get('GEMINI_API_KEY')
+
+# AI aur Bot setup
+genai.configure(api_key=GEMINI_KEY)
+model = genai.GenerativeModel('gemini-pro')
+bot = telebot.TeleBot(BOT_TOKEN)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "Vivek's AI System Online! 😎\n\nBhai, math ka sawal pucho, 'Ratta' nahi logic dikhaunga.")
+    bot.reply_to(message, "Vivek's AI Online! 😎\nAb main Maths, English aur duniya ka har sawal samajhta hoon. Pucho!")
 
 @bot.message_handler(func=lambda message: True)
-def solve_math(message):
-    text = message.text.lower()
-    
-    # Delhi wale ka "Square aur Sum" wala logic
-    if "square" in text and "sum" in text:
-        try:
-            x = symbols('x')
-            # Equation: x^2 + x = 30
-            equation = Eq(x**2 + x, 30)
-            sol = solve(equation, x)
-            bot.reply_to(message, f"System logic: x² + x = 30\nSolution: x = {sol}\n\nAb bol bhai, 'System' hang hua ki nahi? 😎")
-        except:
-            bot.reply_to(message, "Calculation mein thodi dikkat hai, par logic sahi hai!")
-    else:
-        # Baaki kisi bhi calculation ke liye
-        try:
-            # ^ ko ** mein badalna taaki Python samajh sake
-            safe_text = text.replace('^', '**')
-            result = eval(safe_text)
-            bot.reply_to(message, f"Result: {result} ✅")
-        except:
-            bot.reply_to(message, "Bhai, sawal sahi se dalo!")
+def chat(message):
+    try:
+        response = model.generate_content(message.text)
+        bot.reply_to(message, response.text)
+    except Exception as e:
+        bot.reply_to(message, "Bhai, Render par Keys check karo!")
 
 bot.infinity_polling()
-      
+
+
